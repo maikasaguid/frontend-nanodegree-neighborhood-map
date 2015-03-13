@@ -1,0 +1,1 @@
+function initialize(){"use strict";{var a={center:{lat:21.4389123,lng:-158.0000565},zoom:11};new google.maps.Map(document.getElementById("map-canvas"),a)}}google.maps.event.addDomListener(window,"load",initialize);
