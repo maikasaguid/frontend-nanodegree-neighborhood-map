@@ -4,6 +4,7 @@
   "dependencies": {
     "bootstrap-sass-official": "~3.2.0",
     "modernizr": "~2.8.2",
-    "knockout": "~3.3.0"
+    "knockout": "~3.3.0",
+    "css-toggle-switch": "~3.1.1"
   }
 }

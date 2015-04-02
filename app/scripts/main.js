@@ -3,7 +3,6 @@
 
 /* jshint ignore:start */
 var minZoomLevel = 11;
-var foursquare = 'https://api.foursquare.com/v2/venues/search?client_id=T2RYZINQTJUYZIICO2MQXG0BMBAUWNI3F5KBGCIJ5QO3IRBT&client_secret=VMUZGLY0ENBSBSM4HXZOTU5CR2430ABKXT5BTVQOQOJ4N4PS&v=20130815&ll=21.48,-158.025&query=pizza';
 var lat = 21.48,
     lng = -158.025;
 var hnlLat = 21.3,
@@ -62,6 +61,7 @@ function initialize() {
   },
   marker = [];
 
+
   service.radarSearch(request, radarCB);
 
   function radarCB(results, status) {
@@ -69,23 +69,41 @@ function initialize() {
       for (var i = 0; i < results.length; i++) {
         var place = results[i];
 
+        //Creating yellow markers for each location
         marker[i] = new google.maps.Marker({
           position: place.geometry.location,
           map: map,
           icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'
         });
 
-        google.maps.event.addListener(marker[i], 'click', function(e) {
-          populateInfo(place, infoWindow, service, map);
-
-          infoWindow.open(map, this);
-        });
+        addMarkerInfo(marker[i], place);
       }
 
-      service.nearbySearch(request, nearbyCB); //replace 20 most prominent pizza place markers
+      //service.nearbySearch(request, nearbyCB); //replace 20 most prominent pizza place markers
     }
   }
 
+  function addMarkerInfo(marker, place) {
+    var infowindow = new google.maps.InfoWindow();
+    
+    //closure to retain place data
+    (function(marker) {
+      google.maps.event.addListener(marker, "click", function(e) {
+        infoWindow.setContent('');
+
+        service.getDetails(place, function(place, status) {
+          //console.log(place);
+
+          if(status == google.maps.places.PlacesServiceStatus.OK) {
+            infoWindow.setContent(infoWindowContent(place));
+          }
+        });
+
+        infoWindow.open(map, marker);
+      });
+    })(marker);
+  }
+/*
   function nearbyCB(results, status) {
     if(status == google.maps.places.PlacesServiceStatus.OK) {
       for (var i = 0; i < results.length; i++) {
@@ -129,6 +147,8 @@ function initialize() {
               icon: pIcon
             });
 
+            addMarkerInfo(marker[m], place);
+
             continue;
           }
         }
@@ -140,31 +160,100 @@ function initialize() {
   google.maps.event.addListener(map, 'zoom_changed', function() {
     if(map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
   });
+*/
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-function populateInfo(place, iw, svc, map) {
-  svc.getDetails(place, function(place, status) {
-    if(status == google.maps.places.PlacesServiceStatus.OK) {
-      iw.setContent(place.name);
-    }
-  });
+function infoWindowContent(place) {
+  var info = '';
+
+  if(typeof place.name == 'undefined') {
+    place.name = "A Pizza Place with No Name";
+  }
+  info += '<h1>' + place.name + '</h1>';
+
+  if(typeof place.adr_address != 'undefined') {
+    info += place.adr_address + '<br />';
+  }
+
+  if(typeof place.formatted_phone_number != 'undefined') {
+    info += '<span class="phone">' + place.formatted_phone_number + '<span><br />';
+  }
+
+  if(typeof place.website != 'undefined') {
+    info += '<a href="' + place.website + '" class="website" target="_blank">' + place.website + '</a><br />'  
+  }
+
+  if(typeof place.rating != 'undefined') {
+    info += '<span class="rating">Google Rating: ' + place.rating + '</span><br />'  
+  }
+
+  try {
+    info += '<span class="rating" data-bind="text: $data">Foursquare Rating: ' + foursquareRating(place.geometry.location) + '</span><br />'  
+    //console.log(foursquareRating(place.geometry.location));
+  }
+  catch(e) {
+    console.log(e);
+  }
+
+  return info;
 }
 
  /* jshint ignore:end */
 
-//$.getJSON(foursquare, function(data) { 
-    // Now use this data to update your view models, 
-    // and Knockout will update your UI automatically 
+function foursquareRating(location) {
+  var lat = location.k,
+      lng = location.D,
+      rating = '';
 
-    //console.log(data);
-//});
+  var foursquareBase = 'https://api.foursquare.com/v2/venues/explore?client_id=T2RYZINQTJUYZIICO2MQXG0BMBAUWNI3F5KBGCIJ5QO3IRBT&client_secret=VMUZGLY0ENBSBSM4HXZOTU5CR2430ABKXT5BTVQOQOJ4N4PS&v=20130815&query=pizza&radius=100&limit=1&llAcc=10&ll=',
+      foursquareURL = foursquareBase + lat + ',' + lng;
+
+  $.getJSON(foursquareURL, function(data) {
+      // Now use this data to update your view models, 
+      // and Knockout will update your UI automatically 
+
+      try {
+        console.log(data.response.groups[0].items[0].venue.rating);
+
+        (function(data) {
+          return data.response.groups[0].items[0].venue.rating;
+        })(data);
+
+
+
+      }
+      catch(e) {
+        console.log(e);
+      }
+  });
+}
+
+var Marker = function(name, location) {
+  var self = this;
+
+  self.name = name;
+  self.location = location;
+};
 
 function MapViewModel() {
     var self = this;
+
+    self.Markers = ko.observableArray([
+      new Marker('Big Kahuna\'s Pizza', new google.maps.LatLng(21.335522, -157.91654500000004)),
+      new Marker('Bravo Restaurant', new google.maps.LatLng(21.383593, -157.94557099999997)),
+      new Marker('Rosarina Pizza', new google.maps.LatLng(21.31229, -157.862618)),
+      new Marker('Doughlicious', new google.maps.LatLng(21.294302, -157.841133)),
+      new Marker('La Pizza Rina', new google.maps.LatLng(21.298095, -157.83961599999998)),
+      new Marker('Brick Oven Pizza', new google.maps.LatLng(21.332582, -158.082038)),
+      new Marker('Pizza Corner', new google.maps.LatLng(21.342423, -158.124125)),
+      new Marker('Boston\'s North End Pizza Restaurant', new google.maps.LatLng(21.380137, -157.93820600000004)),
+    ]);
 }
 
 function ListViewModel() {
     var self = this;
 }
+
+ko.applyBindings(new MapViewModel());
