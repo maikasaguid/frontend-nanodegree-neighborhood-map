@@ -230,26 +230,69 @@ function foursquareRating(location) {
   });
 }
 
-var Marker = function(name, location) {
-  var self = this;
-
-  self.name = name;
-  self.location = location;
+var Marker = function(name, lat, lng) {
+  this.name = name;
+  this.lat = lat;
+  this.lng = lng;
 };
+
+var ourTopPizza = [
+  {
+    name: 'Big Kahuna\'s Pizza',
+    lat: 21.335522,
+    lng: -157.91654500000004
+  },
+  {
+    name: 'Bravo Restaurant',
+    lat: 21.383593,
+    lng: -157.94557099999997
+  },
+  {
+    name: 'Rosarina Pizza',
+    lat: 21.31229,
+    lng: -157.862618
+  },
+  {
+    name: 'Doughlicious',
+    lat: 21.294302,
+    lng: -157.841133
+  },
+  {
+    name: 'La Pizza Rina',
+    lat: 21.298095,
+    lng: -157.83961599999998
+  },
+  {
+    name: 'Brick Oven Pizza',
+    lat: 21.332582,
+    lng: -158.082038
+  },
+  {
+    name: 'Pizza Corner',
+    lat: 21.342423,
+    lng: -158.124125
+  },
+  {
+    name: 'Boston\'s North End Pizza Restaurant',
+    lat: 21.380137,
+    lng: -157.93820600000004
+  }
+];
 
 function MapViewModel() {
     var self = this;
 
-    self.Markers = ko.observableArray([
-      new Marker('Big Kahuna\'s Pizza', new google.maps.LatLng(21.335522, -157.91654500000004)),
-      new Marker('Bravo Restaurant', new google.maps.LatLng(21.383593, -157.94557099999997)),
-      new Marker('Rosarina Pizza', new google.maps.LatLng(21.31229, -157.862618)),
-      new Marker('Doughlicious', new google.maps.LatLng(21.294302, -157.841133)),
-      new Marker('La Pizza Rina', new google.maps.LatLng(21.298095, -157.83961599999998)),
-      new Marker('Brick Oven Pizza', new google.maps.LatLng(21.332582, -158.082038)),
-      new Marker('Pizza Corner', new google.maps.LatLng(21.342423, -158.124125)),
-      new Marker('Boston\'s North End Pizza Restaurant', new google.maps.LatLng(21.380137, -157.93820600000004)),
-    ]);
+    // Data
+    self.markers = ko.observableArray([]);
+    self.chosenListId = ko.observable();
+
+    // Behaviors
+    self.goToPizzaList = function(pizzaList) {
+      self.chosenListId(pizzaList);
+      // get and populate markers
+    };
+
+    self.goToPizzaList('All Pizza');
 }
 
 function ListViewModel() {
