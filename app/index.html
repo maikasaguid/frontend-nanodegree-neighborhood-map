@@ -43,32 +43,39 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Filter" data-bind"text: filter">
+            <input type="text" class="form-control" placeholder="Filter" data-bind="text: filter">
           </form>
         </div>
       </div>
     </nav>
 
-    <div class="container-fluid">
+    <div class="container-fluid main">
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <form class="switch">
             <label>View</label>
             <div class="switch-toggle well">
               <input id="mapView" name="view" type="radio" checked>
-              <label for="mapView" onclick="">Map</label>
+              <label for="mapView">Map</label>
               <input id="listView" name="view" type="radio">
-              <label for="listView" onclick="">List</label>
+              <label for="listView">List</label>
               <a class="btn"></a>
             </div>
           </form>
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#" data-bind="click: $root.goToPizzaList">All Pizza</a></li>
+            <li><a id="all" href="#" data-bind="click: choosePizzaList">All Pizza</a></li>
           </ul>
           <ul class="nav nav-sidebar">
-            <li><a href="#" data-bind="click: $root.goToPizzaList">Our Top Pizza</a></li>
-            <li><a href="#" data-bind="click: $root.goToPizzaList">Yelp's Best Pizza</a></li>
+            <li class="active"><a id="our" href="#" data-bind="click: choosePizzaList">Our Top Pizza</a></li>
+            <li><a id="yelp" href="#" data-bind="click: choosePizzaList">Yelp's Best Pizza</a></li>
           </ul>
+        </div>
+        <div class="col-sm-10 col-sm-offset-2 list">
+          <div class="list-group" data-bind="foreach: places">
+            <a href="#" class="list-group-item">
+              <h3 data-bind="text: name"></h3>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -93,7 +100,6 @@
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script>
     <script src="bower_components/knockout/dist/knockout.js"></script>
-    <script src="bower_components/sammy/lib/sammy.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 

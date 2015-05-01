@@ -101,20 +101,17 @@ body {
 }
 
 /*
- * Top navigation
- * Hide default border to remove 1px line.
- */
-.navbar-fixed-top {
-  border: 0;
-}
-
-/*
  * Sidebar
  */
 
 /* Hide for mobile, show later */
 .sidebar {
   display: none;
+  .switch-toggle {
+    label {
+      cursor: pointer;
+    }
+  }
 }
 
 @media (min-width: 768px) {

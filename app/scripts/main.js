@@ -28,219 +28,53 @@ var icons = {
     icon: iconBase + 'icon63.png'
   }
 };
-
-function initialize() {
-  var mapOptions = {
-    center: {lat: lat, lng: lng},
-    mapTypeControl: false,
-    panControl: false,
-    streetViewControl: false,
-    zoom: minZoomLevel,
-    zoomControl: true,
-    zoomControlOptions: {
-      position: google.maps.ControlPosition.RIGHT_TOP
-    }
+var map = new google.maps.Map(document.getElementById('map'), {
+  center: {
+    lat: lat,
+    lng: lng
   },
-  map = new google.maps.Map(document.getElementById('map'), mapOptions),
-  infoWindow = new google.maps.InfoWindow(),
-  service = new google.maps.places.PlacesService(map),
-  oahu = new google.maps.LatLng(lat, lng),
-  hnl = new google.maps.LatLng(hnlLat, hnlLng),
-  request = {
-    location: oahu,
-    radius: '50000',
-    keyword: 'pizza',
-    types: [
-      'bar',
-      'cafe',
-      'food',
-      'meal_delivery',
-      'meal_takeaway',
-      'restaurant'
-    ]
-  },
-  marker = [];
+  mapTypeControl: false,
+  panControl: false,
+  streetViewControl: false,
+  zoom: minZoomLevel,
+  zoomControl: true,
+  zoomControlOptions: {
+    position: google.maps.ControlPosition.RIGHT_TOP
+  }
+});
 
+// Limit the zoom level
+google.maps.event.addListener(map, 'zoom_changed', function() {
+  if(map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
+});
 
-  service.radarSearch(request, radarCB);
+function convertToMarkers(places) {
+  var i = 0,
+  marks = [];
 
-  function radarCB(results, status) {
-    if(status == google.maps.places.PlacesServiceStatus.OK) {
-      for (var i = 0; i < results.length; i++) {
-        var place = results[i];
+  while(i < places.length) {
+    marks[i] = new google.maps.Marker({
+      position: new google.maps.LatLng(places[i].lat, places[i].lng),
+      title: places[i].name,
+      map: map
+    });
 
-        //Creating yellow markers for each location
-        marker[i] = new google.maps.Marker({
-          position: place.geometry.location,
-          map: map,
-          icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'
-        });
-
-        addMarkerInfo(marker[i], place);
-      }
-
-      //service.nearbySearch(request, nearbyCB); //replace 20 most prominent pizza place markers
-    }
+    i++;
   }
 
-  function addMarkerInfo(marker, place) {
-    var infowindow = new google.maps.InfoWindow();
-    
-    //closure to retain place data
-    (function(marker) {
-      google.maps.event.addListener(marker, "click", function(e) {
-        infoWindow.setContent('');
-
-        service.getDetails(place, function(place, status) {
-          //console.log(place);
-
-          if(status == google.maps.places.PlacesServiceStatus.OK) {
-            infoWindow.setContent(infoWindowContent(place));
-          }
-        });
-
-        infoWindow.open(map, marker);
-      });
-    })(marker);
-  }
-/*
-  function nearbyCB(results, status) {
-    if(status == google.maps.places.PlacesServiceStatus.OK) {
-      for (var i = 0; i < results.length; i++) {
-        var place = results[i],
-            m, //index of found prominent marker
-            pIcon;
-
-        for(var j = 0; j < marker.length; j++) {
-          if(marker[j].position.equals(place.geometry.location)) {
-            m = j;
-
-            marker[m].setMap(null); //remove existing marker
-
-            //Add some icons for common places
-            if(place.name.indexOf('Hut') > -1) {
-              pIcon = '/images/logo-pizza-hut.png';
-            }
-            else if(place.name.indexOf('Caesar') > -1) {
-              pIcon = '/images/logo-little-caesars.png';
-            }
-            else if(place.name.indexOf('California') > -1) {
-              pIcon = '/images/logo-cpk.png';
-            }
-            else if(place.name.indexOf('Papa') > -1) {
-              pIcon = '/images/logo-papa-johns.png';
-            }
-            else if(place.name.indexOf('Round') > -1) {
-              pIcon = '/images/logo-round-table.png';
-            }
-            else if(place.name.indexOf('Domino') > -1) {
-              pIcon = '/images/logo-dominos.png';
-            }
-            else if(place.name.indexOf('Boston') > -1) {
-              pIcon = '/images/logo-boston-pizza.png';
-            }
-            else pIcon = icons[place.types[0]].icon;
-
-            marker[m] = new google.maps.Marker({
-              position: place.geometry.location,
-              map: map,
-              icon: pIcon
-            });
-
-            addMarkerInfo(marker[m], place);
-
-            continue;
-          }
-        }
-      }
-    }
-  }
-
-  // Limit the zoom level
-  google.maps.event.addListener(map, 'zoom_changed', function() {
-    if(map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
-  });
-*/
+  return marks;
 }
-
-google.maps.event.addDomListener(window, 'load', initialize);
-
-function infoWindowContent(place) {
-  var info = '';
-
-  if(typeof place.name == 'undefined') {
-    place.name = "A Pizza Place with No Name";
-  }
-  info += '<h1>' + place.name + '</h1>';
-
-  if(typeof place.adr_address != 'undefined') {
-    info += place.adr_address + '<br />';
-  }
-
-  if(typeof place.formatted_phone_number != 'undefined') {
-    info += '<span class="phone">' + place.formatted_phone_number + '<span><br />';
-  }
-
-  if(typeof place.website != 'undefined') {
-    info += '<a href="' + place.website + '" class="website" target="_blank">' + place.website + '</a><br />'  
-  }
-
-  if(typeof place.rating != 'undefined') {
-    info += '<span class="rating">Google Rating: ' + place.rating + '</span><br />'  
-  }
-
-  try {
-    info += '<span class="rating" data-bind="text: $data">Foursquare Rating: ' + foursquareRating(place.geometry.location) + '</span><br />'  
-    //console.log(foursquareRating(place.geometry.location));
-  }
-  catch(e) {
-    console.log(e);
-  }
-
-  return info;
-}
-
- /* jshint ignore:end */
-
-function foursquareRating(location) {
-  var lat = location.k,
-      lng = location.D,
-      rating = '';
-
-  var foursquareBase = 'https://api.foursquare.com/v2/venues/explore?client_id=T2RYZINQTJUYZIICO2MQXG0BMBAUWNI3F5KBGCIJ5QO3IRBT&client_secret=VMUZGLY0ENBSBSM4HXZOTU5CR2430ABKXT5BTVQOQOJ4N4PS&v=20130815&query=pizza&radius=100&limit=1&llAcc=10&ll=',
-      foursquareURL = foursquareBase + lat + ',' + lng;
-
-  $.getJSON(foursquareURL, function(data) {
-      // Now use this data to update your view models, 
-      // and Knockout will update your UI automatically 
-
-      try {
-        console.log(data.response.groups[0].items[0].venue.rating);
-
-        (function(data) {
-          return data.response.groups[0].items[0].venue.rating;
-        })(data);
-
-
-
-      }
-      catch(e) {
-        console.log(e);
-      }
-  });
-}
-
-var Marker = function(name, lat, lng) {
-  this.name = name;
-  this.lat = lat;
-  this.lng = lng;
-};
 
 var ourTopPizza = [
   {
     name: 'Big Kahuna\'s Pizza',
     lat: 21.335522,
     lng: -157.91654500000004
+  },
+  {
+    name: 'J.J. Dolans',
+    lat: 21.310943,
+    lng: -157.860536
   },
   {
     name: 'Bravo Restaurant',
@@ -273,30 +107,115 @@ var ourTopPizza = [
     lng: -158.124125
   },
   {
+    name: 'Serino\'s Pizza',
+    lat: 21.308459,
+    lng: -157.810562
+  },
+  {
     name: 'Boston\'s North End Pizza Restaurant',
     lat: 21.380137,
     lng: -157.93820600000004
   }
 ];
 
-function MapViewModel() {
-    var self = this;
+var yelpTopPizza = [
+  {
+    name: 'Hiking Hawaii Cafe',
+    lat: 21.285458,
+    lng: -157.835197
+  },
+  {
+    name: 'Kaneohe\'s Boston Pizza',
+    lat: 21.418950,
+    lng: -157.804038
+  },
+  {
+    name: 'Amina Pizzeria',
+    lat: 21.292439,
+    lng: -157.836421
+  },
+  {
+    name: 'JJ Dolan\'s',
+    lat: 21.310943,
+    lng: -157.860536
+  },
+  {
+    name: 'The Lovin\' Oven',
+    lat: 21.276885,
+    lng: -157.823936
+  },
+  {
+    name: 'Uncle Bo\'s Pupu Bar & Grill',
+    lat: 21.277740,
+    lng: -157.813856
+  },
+  {
+    name: 'Marketplace Cafe',
+    lat: 21.292547,
+    lng: -157.841960
+  },
+  {
+    name: 'Impossibles Pizza',
+    lat: 21.664547,
+    lng: -158.050516
+  },
+  {
+    name: 'Arancino on Beachwalk',
+    lat: 21.280135,
+    lng: -157.830890
+  },
+  {
+    name: 'Fendu Boulangrie',
+    lat: 21.307802,
+    lng: -157.810460
+  }
+];
 
-    // Data
-    self.markers = ko.observableArray([]);
-    self.chosenListId = ko.observable();
+function AppViewModel() {
+  var self = this;
 
-    // Behaviors
-    self.goToPizzaList = function(pizzaList) {
-      self.chosenListId(pizzaList);
-      // get and populate markers
-    };
+  self.markers = ko.observableArray(convertToMarkers(ourTopPizza));
+  self.places = ko.observableArray(ourTopPizza);
 
-    self.goToPizzaList('All Pizza');
+  self.choosePizzaList = function(data, event) {
+    ko.utils.arrayForEach(self.markers(), function(marker) {
+      marker.setMap(null);
+    });
+
+    self.places([]);
+
+    if(event.target.id === 'yelp') {
+      self.markers(convertToMarkers(yelpTopPizza));
+      self.places(yelpTopPizza);
+    }
+    if(event.target.id === 'our') {
+      self.markers(convertToMarkers(ourTopPizza));
+      self.places(ourTopPizza);
+    }
+    if(event.target.id === 'all') {
+      
+    }
+  }
 }
 
-function ListViewModel() {
-    var self = this;
-}
+ko.applyBindings(new AppViewModel());
 
-ko.applyBindings(new MapViewModel());
+$('.main .list').hide();
+
+$('.well label').click(function () {
+  if($('#map').is(':visible')) {
+    $('#map').hide();
+    $('.main .list').show();
+  }
+  else {
+    $('.main .list').hide();
+    $('#map').show();
+  }
+});
+
+$('.nav-sidebar').children('li').click(function() {
+  $('.nav-sidebar').children('li').removeClass('active');
+  $(this).addClass('active');
+});
+
+ /* jshint ignore:end */
