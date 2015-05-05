@@ -69,52 +69,62 @@ var ourTopPizza = [
   {
     name: 'Big Kahuna\'s Pizza',
     lat: 21.335522,
-    lng: -157.91654500000004
+    lng: -157.91654500000004,
+    show: true
   },
   {
     name: 'J.J. Dolans',
     lat: 21.310943,
-    lng: -157.860536
+    lng: -157.860536,
+    show: true
   },
   {
     name: 'Bravo Restaurant',
     lat: 21.383593,
-    lng: -157.94557099999997
+    lng: -157.94557099999997,
+    show: true
   },
   {
     name: 'Rosarina Pizza',
     lat: 21.31229,
-    lng: -157.862618
+    lng: -157.862618,
+    show: true
   },
   {
     name: 'Doughlicious',
     lat: 21.294302,
-    lng: -157.841133
+    lng: -157.841133,
+    show: true
   },
   {
     name: 'La Pizza Rina',
     lat: 21.298095,
-    lng: -157.83961599999998
+    lng: -157.83961599999998,
+    show: true
   },
   {
     name: 'Brick Oven Pizza',
     lat: 21.332582,
-    lng: -158.082038
+    lng: -158.082038,
+    show: true
   },
   {
     name: 'Pizza Corner',
     lat: 21.342423,
-    lng: -158.124125
+    lng: -158.124125,
+    show: true
   },
   {
     name: 'Serino\'s Pizza',
     lat: 21.308459,
-    lng: -157.810562
+    lng: -157.810562,
+    show: true
   },
   {
     name: 'Boston\'s North End Pizza Restaurant',
     lat: 21.380137,
-    lng: -157.93820600000004
+    lng: -157.93820600000004,
+    show: true
   }
 ];
 
@@ -122,52 +132,62 @@ var yelpTopPizza = [
   {
     name: 'Hiking Hawaii Cafe',
     lat: 21.285458,
-    lng: -157.835197
+    lng: -157.835197,
+    show: true
   },
   {
     name: 'Kaneohe\'s Boston Pizza',
     lat: 21.418950,
-    lng: -157.804038
+    lng: -157.804038,
+    show: true
   },
   {
     name: 'Amina Pizzeria',
     lat: 21.292439,
-    lng: -157.836421
+    lng: -157.836421,
+    show: true
   },
   {
     name: 'JJ Dolan\'s',
     lat: 21.310943,
-    lng: -157.860536
+    lng: -157.860536,
+    show: true
   },
   {
     name: 'The Lovin\' Oven',
     lat: 21.276885,
-    lng: -157.823936
+    lng: -157.823936,
+    show: true
   },
   {
     name: 'Uncle Bo\'s Pupu Bar & Grill',
     lat: 21.277740,
-    lng: -157.813856
+    lng: -157.813856,
+    show: true
   },
   {
     name: 'Marketplace Cafe',
     lat: 21.292547,
-    lng: -157.841960
+    lng: -157.841960,
+    show: true
   },
   {
     name: 'Impossibles Pizza',
     lat: 21.664547,
-    lng: -158.050516
+    lng: -158.050516,
+    show: true
   },
   {
     name: 'Arancino on Beachwalk',
     lat: 21.280135,
-    lng: -157.830890
+    lng: -157.830890,
+    show: true
   },
   {
     name: 'Fendu Boulangrie',
     lat: 21.307802,
-    lng: -157.810460
+    lng: -157.810460,
+    show: true
   }
 ];
 
@@ -176,6 +196,8 @@ function AppViewModel() {
 
   self.markers = ko.observableArray(convertToMarkers(ourTopPizza));
   self.places = ko.observableArray(ourTopPizza);
+  self.filter = ko.observable('');
+  self.currentList = ourTopPizza;
 
   self.choosePizzaList = function(data, event) {
     ko.utils.arrayForEach(self.markers(), function(marker) {
@@ -185,16 +207,33 @@ function AppViewModel() {
     self.places([]);
 
     if(event.target.id === 'yelp') {
-      self.markers(convertToMarkers(yelpTopPizza));
-      self.places(yelpTopPizza);
+      self.currentList = yelpTopPizza;
     }
     if(event.target.id === 'our') {
-      self.markers(convertToMarkers(ourTopPizza));
-      self.places(ourTopPizza);
+      self.currentList = ourTopPizza;
     }
     if(event.target.id === 'all') {
       
     }
+
+    self.markers(convertToMarkers(self.currentList));
+    self.places(self.currentList);
+  };
+
+  self.filteredPlaces = ko.computed(function() {
+    if(!self.filter()) {
+      return self.places();
+    }
+    else {
+      return ko.utils.arrayFilter(self.places(), function(place) { 
+        return place.name.toLowerCase().indexOf(self.filter().toLowerCase()) !== -1;
+      });
+    }
+  }, self);
+
+  self.filterListMap = function(data, event) {
+    self.markers(convertToMarkers(self.filteredPlaces()));
+    self.places(self.filteredPlaces());
   }
 }
 
