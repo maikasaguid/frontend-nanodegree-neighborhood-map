@@ -71,9 +71,9 @@
           </ul>
         </div>
         <div class="col-sm-10 col-sm-offset-2 list">
-          <div class="list-group" data-bind="foreach: places">
-            <a href="#" class="list-group-item">
-              <h3 data-bind="text: name, visible: show"></h3>
+          <div class="list-group" data-bind="foreach: locations">
+            <a href="#" class="list-group-item" data-bind="visible: show">
+              <h3 data-bind="text: name"></h3>
             </a>
           </div>
         </div>
