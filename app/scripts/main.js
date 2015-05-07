@@ -7,41 +7,44 @@ var lat = 21.48,
     lng = -158.025;
 var hnlLat = 21.3,
     hnlLng = -157.858;
-var iconBase = 'http://maps.google.com/mapfiles/kml/pal2/';
-var icons = {
-  bar: {
-    icon: iconBase + 'icon27.png'
-  },
-  cafe: {
-    icon: iconBase + 'icon62.png'
-  },
-  food: {
-    icon: iconBase + 'icon47.png'
-  },
-  meal_delivery: {
-    icon: iconBase + 'icon47.png'
-  },
-  meal_takeaway: {
-    icon: iconBase + 'icon47.png'
-  },
-  restaurant: {
-    icon: iconBase + 'icon63.png'
-  }
-};
+var icon = 'http://labs.google.com/ridefinder/images/mm_20_yellow.png',
+    iconBase = 'http://maps.google.com/mapfiles/kml/pal2/',
+    icons = {
+      bar: {
+        icon: iconBase + 'icon27.png'
+      },
+      cafe: {
+        icon: iconBase + 'icon62.png'
+      },
+      food: {
+        icon: iconBase + 'icon47.png'
+      },
+      meal_delivery: {
+        icon: iconBase + 'icon47.png'
+      },
+      meal_takeaway: {
+        icon: iconBase + 'icon47.png'
+      },
+      restaurant: {
+        icon: iconBase + 'icon63.png'
+      }
+    };
 var map = new google.maps.Map(document.getElementById('map'), {
-  center: {
-    lat: lat,
-    lng: lng
-  },
-  mapTypeControl: false,
-  panControl: false,
-  streetViewControl: false,
-  zoom: minZoomLevel,
-  zoomControl: true,
-  zoomControlOptions: {
-    position: google.maps.ControlPosition.RIGHT_TOP
-  }
-});
+      center: {
+        lat: lat,
+        lng: lng
+      },
+      mapTypeControl: false,
+      panControl: false,
+      streetViewControl: false,
+      zoom: minZoomLevel,
+      zoomControl: true,
+      zoomControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_TOP
+      }
+    }),
+    infoWindow = new google.maps.InfoWindow(),
+    service = new google.maps.places.PlacesService(map);
 
 // Limit the zoom level
 google.maps.event.addListener(map, 'zoom_changed', function() {
@@ -159,11 +162,17 @@ function Location(name, lat, lng, show) {
   this.lat = lat;
   this.lng = lng;
   this.marker = new google.maps.Marker({
+    icon: icon,
+    map: map,
     position: new google.maps.LatLng(lat, lng),
-    title: name,
-    map: map
+    title: name
   });
   this.show = ko.observable(show);
+
+  google.maps.event.addListener(this.marker, 'click', function(e) {
+    infoWindow.setContent(this.title);
+    infoWindow.open(map, this);
+  });
 }
 
 function convertToLocations(places) {
