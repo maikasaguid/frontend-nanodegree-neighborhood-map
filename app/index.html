@@ -43,7 +43,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Filter" data-bind="textInput: filter, event: {keyup: filterListMap}" autocomplete="off">
+            <input type="text" class="form-control" placeholder="Filter Locations" data-bind="textInput: filter, event: {keyup: filterListMap}" autocomplete="off">
           </form>
         </div>
       </div>
@@ -51,7 +51,7 @@
 
     <div class="container-fluid main">
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <div class="col-md-2 sidebar sidebar">
           <form class="switch">
             <label>View</label>
             <div class="switch-toggle well">
@@ -62,9 +62,11 @@
               <a class="btn"></a>
             </div>
           </form>
+          <!-- All Pizza
           <ul class="nav nav-sidebar">
             <li><a id="all" href="#" data-bind="click: choosePizzaList">All Pizza</a></li>
           </ul>
+          -->
           <ul class="nav nav-sidebar">
             <li class="active"><a id="our" href="#" data-bind="click: choosePizzaList">Our Top Pizza</a></li>
             <li><a id="yelp" href="#" data-bind="click: choosePizzaList">Yelp's Best Pizza</a></li>

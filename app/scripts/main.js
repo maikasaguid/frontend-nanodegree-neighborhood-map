@@ -4,11 +4,10 @@
 /* jshint ignore:start */
 var minZoomLevel = 11;
 var lat = 21.48,
-    lng = -158.025;
+    lng = -158.035;
 var hnlLat = 21.3,
     hnlLng = -157.858;
-var icon = 'http://labs.google.com/ridefinder/images/mm_20_yellow.png',
-    iconBase = 'http://maps.google.com/mapfiles/kml/pal2/',
+var iconBase = 'http://maps.google.com/mapfiles/kml/pal2/',
     icons = {
       bar: {
         icon: iconBase + 'icon27.png'
@@ -49,6 +48,13 @@ var map = new google.maps.Map(document.getElementById('map'), {
 // Limit the zoom level
 google.maps.event.addListener(map, 'zoom_changed', function() {
   if(map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
+});
+
+var mapCenter = map.getCenter();
+
+//Re-center on re-size
+google.maps.event.addDomListener(window, 'resize', function() {
+  map.setCenter(mapCenter);
 });
 
 var ourTopPizza = [
@@ -158,18 +164,23 @@ var yelpTopPizza = [
 ];
 
 function Location(name, lat, lng, show) {
-  this.name = name;
-  this.lat = lat;
-  this.lng = lng;
-  this.marker = new google.maps.Marker({
-    icon: icon,
+  var self = this;
+
+  self.name = name;
+  self.lat = lat;
+  self.lng = lng;
+  self.marker = new google.maps.Marker({
+    icon: {
+      scaledSize: new google.maps.Size(54, 27),
+      url: 'images/icon.svg'
+    },
     map: map,
     position: new google.maps.LatLng(lat, lng),
     title: name
   });
-  this.show = ko.observable(show);
+  self.show = ko.observable(show);
 
-  google.maps.event.addListener(this.marker, 'click', function(e) {
+  google.maps.event.addListener(self.marker, 'click', function(e) {
     infoWindow.setContent(this.title);
     infoWindow.open(map, this);
   });
@@ -188,20 +199,20 @@ function convertToLocations(places) {
 function AppViewModel() {
   var self = this;
 
-  self.filter = ko.observable('');
   self.currentList = ourTopPizza;
   self.currentListString = 'our';
+  self.filter = ko.observable('');
   self.locations = ko.observableArray(convertToLocations(self.currentList));
 
   self.choosePizzaList = function(data, event) {
     if(event.target.id != self.currentListString) {
       self.currentListString = event.target.id;
 
-      ko.utils.arrayForEach(self.locations(), function(location) {
+      ko.utils.arrayForEach(self.locations(), function(location) { //remove markers from map
         location.marker.setMap(null);
       });
 
-      self.locations([]);
+      self.locations([]); //clear observableArray
 
       if(event.target.id === 'yelp') {
         self.currentList = yelpTopPizza;
@@ -210,11 +221,11 @@ function AppViewModel() {
         self.currentList = ourTopPizza;
       }
       if(event.target.id === 'all') {
-        
+        //Google Maps radar search
       }
 
       self.locations(convertToLocations(self.currentList));
-      self.filterListMap();
+      self.filterListMap(); //run through filter
     }
   };
 
@@ -233,22 +244,24 @@ function AppViewModel() {
 
 ko.applyBindings(new AppViewModel());
 
-$('.main .list').hide();
+$( document ).ready(function() { 
+  $('.main .list').hide();
 
-$('.well label').click(function () {
-  if($('#map').is(':visible')) {
-    $('#map').hide();
-    $('.main .list').show();
-  }
-  else {
-    $('.main .list').hide();
-    $('#map').show();
-  }
-});
+  $('.well label').click(function () { //switch between map and list
+    if($('#map').is(':visible')) {
+      $('#map').hide();
+      $('.main .list').show();
+    }
+    else {
+      $('.main .list').hide();
+      $('#map').show();
+    }
+  });
 
-$('.nav-sidebar').children('li').click(function() {
-  $('.nav-sidebar').children('li').removeClass('active');
-  $(this).addClass('active');
+  $('.nav-sidebar').children('li').click(function() { //handle highlighting of sidebar lists
+    $('.nav-sidebar').children('li').removeClass('active');
+    $(this).addClass('active');
+  });
 });
 
  /* jshint ignore:end */
