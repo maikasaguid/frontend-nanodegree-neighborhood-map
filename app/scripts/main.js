@@ -248,18 +248,23 @@ $( document ).ready(function() {
   $('.main .list').hide();
 
   $('.well label').click(function () { //switch between map and list
-    if($('#map').is(':visible')) {
-      $('#map').hide();
-      $('.main .list').show();
-    }
-    else {
+    if($(this).attr('for') == 'mapView' || $(this).attr('for') == 'mapView2') {
       $('.main .list').hide();
       $('#map').show();
+    }
+    if($(this).attr('for') == 'listView' || $(this).attr('for') == 'listView2') {
+      $('#map').hide();
+      $('.main .list').show();
     }
   });
 
   $('.nav-sidebar').children('li').click(function() { //handle highlighting of sidebar lists
     $('.nav-sidebar').children('li').removeClass('active');
+    $(this).addClass('active');
+  });
+
+  $('.nav-list').children('li').click(function() { //handle highlighting of sidebar lists
+    $('.nav-list').children('li').removeClass('active');
     $(this).addClass('active');
   });
 });
