@@ -89,10 +89,10 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 list">
           <div class="list-group" data-bind="foreach: locations">
-            <a href="#" class="list-group-item location" data-toggle="collapse" data-bind="visible: show, attr: { 'data-target': '#location-' + $index() }">
+            <a href="#" class="list-group-item location" data-toggle="collapse" data-bind="visible: show, attr: { 'data-target': '#location-' + $index() }, click: $parent.getAPIData">
               <h1 class="name" data-bind="text: name"></h1>
             </a>
-            <div class="collapse details" data-bind="attr: { id: 'location-' + $index() }">Test</div>
+            <div class="collapse details" data-bind="attr: { id: 'location-' + $index() }, html: infoList">Retrieving data...</div>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 'use strict';
 
 /* jshint ignore:start */
+var foursquareAPI = 'https://api.foursquare.com/v2/venues/explore?oauth_token=VFBZKAJP32E521Y2JXBQ05NBY4ZYQZMDSZBUL4N0IA0UJ5O1&v=20150511';
 var minZoomLevel = 11;
 var lat = 21.48,
     lng = -158.035;
@@ -166,6 +167,7 @@ var yelpTopPizza = [
 function Location(name, lat, lng, show) {
   var self = this;
 
+  self.ll = lat + ',' + lng;
   self.name = name;
   self.lat = lat;
   self.lng = lng;
@@ -179,9 +181,47 @@ function Location(name, lat, lng, show) {
     title: name
   });
   self.show = ko.observable(show);
+  self.hours = ko.observable(0);
+  self.phone = ko.observable(0);
+  self.rating = ko.observable(0);
+  self.location = ko.observable(0);
+  self.foursquare = ko.observable(false);
+  self.infoMarker = ko.computed(function() {
+    return '<h1>' + self.name + '</h1>' + 
+      self.phone() + '<br />' + 
+      self.location().address + '<br />' + 
+      self.location().city + ', ' + self.location().state + '<br />' +
+      self.hours() + '<br />' + 
+      'Foursquare Rating: ' + self.rating();
+  }, self);
+  self.infoList = ko.computed(function() {
+    return self.phone() + '<br />' + 
+      self.location().address + '<br />' + 
+      self.location().city + ', ' + self.location().state + '<br />' +
+      self.hours() + '<br />' + 
+      'Foursquare Rating: ' + self.rating();
+  }, self);
 
   google.maps.event.addListener(self.marker, 'click', function(e) {
-    infoWindow.setContent(this.title);
+    var foursquareURL = foursquareAPI + '&ll=' + self.ll + '&llAcc=100&query=pizza&limit=1';
+
+    infoWindow.setContent(''); //clear out marker content
+
+    //get data from Foursquare
+    $.getJSON(foursquareURL).done(function(data) {
+      self.foursquare(true);
+      self.rating(data.response.groups[0].items[0].venue.rating);
+      self.phone(data.response.groups[0].items[0].venue.contact.formattedPhone);
+      self.hours(data.response.groups[0].items[0].venue.hours.status);
+      self.location(data.response.groups[0].items[0].venue.location);
+
+      infoWindow.setContent(self.infoMarker());
+    }).fail(function() {
+      infoWindow.setContent('<h1>' + self.name + '</h1><br />' +
+        'Unable to load Foursquare data.'
+      );
+    });
+    
     infoWindow.open(map, this);
   });
 }
@@ -225,9 +265,34 @@ function AppViewModel() {
       }
 
       self.locations(convertToLocations(self.currentList));
-      self.filterListMap(); //run through filter
+      self.filterListMap(); //filter current list
     }
   };
+
+  self.getAPIData = function(location, event) {
+    if(location.foursquare() == false) {
+      var foursquareURL = foursquareAPI + '&ll=' + location.ll + '&llAcc=100&query=pizza&limit=1';
+
+      //get data from Foursquare
+      $.getJSON(foursquareURL).done(function(data) {
+        location.foursquare(true);
+        location.rating(data.response.groups[0].items[0].venue.rating);
+        location.phone(data.response.groups[0].items[0].venue.contact.formattedPhone);
+        location.hours(data.response.groups[0].items[0].venue.hours.status);
+        location.location(data.response.groups[0].items[0].venue.location);
+      }).fail(function() {
+        return '<h1>' + location.name + '</h1><br />' +
+          'Unable to load Foursquare data.'
+      });
+    }
+
+    return '<h1>' + location.name + '</h1>' + 
+      location.phone() + '<br />' + 
+      location.location().address + '<br />' + 
+      location.location().city + ', ' + location.location().state + '<br />' +
+      location.hours() + '<br />' + 
+      'Foursquare Rating: ' + location.rating();
+  }
 
   self.filterListMap = function(data, event) {
     ko.utils.arrayForEach(self.locations(), function(location) {
@@ -244,8 +309,10 @@ function AppViewModel() {
 
 ko.applyBindings(new AppViewModel());
 
-$( document ).ready(function() { 
-  $('.main .list').hide();
+$(document).ready(function() { 
+  $('.main .list').hide().click(function(e) {
+    e.preventDefault();
+  });
 
   $('.well label').click(function () { //switch between map and list
     if($(this).attr('for') == 'mapView' || $(this).attr('for') == 'mapView2') {
