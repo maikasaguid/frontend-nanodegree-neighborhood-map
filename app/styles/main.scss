@@ -33,11 +33,15 @@ body {
     margin-left: 15px;
   }
 }
-
-.navbar-static-top {
+.navbar-fixed-top {
   border: 0;
 }
-
+#list {
+  margin-top: 55px;
+  .list-group {
+    margin-bottom: 5px;
+  }
+}
 #navbar {
   .nav-list {
     margin-right: -15px;
@@ -114,6 +118,9 @@ body {
     border-bottom: 0;
     border-top: 0;
     padding: 10px 15px;
+    &:last-child {
+      border-bottom: 1px solid #ddd;
+    }
   }
   .location .name {
     font-size: 1.5em;
@@ -153,6 +160,9 @@ body {
   .container-fluid {
     padding-left: 0;
     padding-right: 0;
+    .row {
+      margin: 0;
+    }
   }
   .navbar-header {
     float: right;

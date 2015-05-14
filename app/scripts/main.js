@@ -4,7 +4,7 @@
 /* jshint ignore:start */
 var foursquareAPI = 'https://api.foursquare.com/v2/venues/explore?oauth_token=VFBZKAJP32E521Y2JXBQ05NBY4ZYQZMDSZBUL4N0IA0UJ5O1&v=20150511';
 var minZoomLevel = 11;
-var lat = 21.48,
+var lat = 21.49,
     lng = -158.035;
 var hnlLat = 21.3,
     hnlLng = -157.858;
@@ -40,7 +40,7 @@ var map = new google.maps.Map(document.getElementById('map'), {
       zoom: minZoomLevel,
       zoomControl: true,
       zoomControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_TOP
+        position: google.maps.ControlPosition.RIGHT_CENTER
       }
     }),
     infoWindow = new google.maps.InfoWindow(),
@@ -181,29 +181,43 @@ function Location(name, lat, lng, show) {
     title: name
   });
   self.show = ko.observable(show);
-  self.hours = ko.observable(0);
-  self.phone = ko.observable(0);
-  self.rating = ko.observable(0);
-  self.location = ko.observable(0);
+  self.hours = ko.observable('No hours found.');
+  self.phone = ko.observable('No phone number found.');
+  self.rating = ko.observable('No rating found.');
+  self.address = ko.observable('No address found.');
   self.foursquare = ko.observable(false);
   self.infoMarker = ko.computed(function() {
-    return '<h1>' + self.name + '</h1>' + 
-      self.phone() + '<br />' + 
-      self.location().address + '<br />' + 
-      self.location().city + ', ' + self.location().state + '<br />' +
-      self.hours() + '<br />' + 
-      'Foursquare Rating: ' + self.rating();
+    if(self.foursquare) {
+      return '<h1>' + self.name + '</h1>' + 
+        self.phone() + '<br />' + 
+        self.address().address + '<br />' + 
+        self.address().city + ', ' + self.address().state + '<br />' +
+        self.hours() + '<br />' + 
+        'Foursquare Rating: ' + self.rating();
+    }
+    else {
+      return '<h1>' + self.name + '</h1>' + 
+        'Unable to load Foursquare data.';
+    }
   }, self);
   self.infoList = ko.computed(function() {
-    return self.phone() + '<br />' + 
-      self.location().address + '<br />' + 
-      self.location().city + ', ' + self.location().state + '<br />' +
-      self.hours() + '<br />' + 
-      'Foursquare Rating: ' + self.rating();
+    if(self.foursquare) {
+      return self.phone() + '<br />' + 
+        self.address().address + '<br />' + 
+        self.address().city + ', ' + self.address().state + '<br />' +
+        self.hours() + '<br />' + 
+        'Foursquare Rating: ' + self.rating();
+    }
+    else {
+      return 'Unable to load Foursquare data.';
+    }
   }, self);
 
   google.maps.event.addListener(self.marker, 'click', function(e) {
     var foursquareURL = foursquareAPI + '&ll=' + self.ll + '&llAcc=100&query=pizza&limit=1';
+
+    mapCenter = self.marker.getPosition();
+    map.setCenter(mapCenter); //Re-center on marker click
 
     infoWindow.setContent(''); //clear out marker content
 
@@ -213,13 +227,11 @@ function Location(name, lat, lng, show) {
       self.rating(data.response.groups[0].items[0].venue.rating);
       self.phone(data.response.groups[0].items[0].venue.contact.formattedPhone);
       self.hours(data.response.groups[0].items[0].venue.hours.status);
-      self.location(data.response.groups[0].items[0].venue.location);
-
+      self.address(data.response.groups[0].items[0].venue.location);
       infoWindow.setContent(self.infoMarker());
     }).fail(function() {
-      infoWindow.setContent('<h1>' + self.name + '</h1><br />' +
-        'Unable to load Foursquare data.'
-      );
+      self.foursquare(false);
+      infoWindow.setContent(self.infoMarker());
     });
     
     infoWindow.open(map, this);
@@ -275,23 +287,21 @@ function AppViewModel() {
 
       //get data from Foursquare
       $.getJSON(foursquareURL).done(function(data) {
+        var rating = data.response.groups[0].items[0].venue.rating,
+            phone = data.response.groups[0].items[0].venue.contact.formattedPhone,
+            hours = data.response.groups[0].items[0].venue.hours.status,
+            address = data.response.groups[0].items[0].venue.location;
+
         location.foursquare(true);
-        location.rating(data.response.groups[0].items[0].venue.rating);
-        location.phone(data.response.groups[0].items[0].venue.contact.formattedPhone);
-        location.hours(data.response.groups[0].items[0].venue.hours.status);
-        location.location(data.response.groups[0].items[0].venue.location);
+        
+        if(typeof rating != 'undefined') location.rating(rating);
+        if(typeof phone != 'undefined') location.phone(phone);
+        if(typeof hours != 'undefined') location.hours(hours);
+        if(typeof location != 'undefined') location.address(address);
       }).fail(function() {
-        return '<h1>' + location.name + '</h1><br />' +
-          'Unable to load Foursquare data.'
+        location.foursquare(false);
       });
     }
-
-    return '<h1>' + location.name + '</h1>' + 
-      location.phone() + '<br />' + 
-      location.location().address + '<br />' + 
-      location.location().city + ', ' + location.location().state + '<br />' +
-      location.hours() + '<br />' + 
-      'Foursquare Rating: ' + location.rating();
   }
 
   self.filterListMap = function(data, event) {
@@ -325,12 +335,12 @@ $(document).ready(function() {
     }
   });
 
-  $('.nav-sidebar').children('li').click(function() { //handle highlighting of sidebar lists
+  $('.nav-sidebar').children('li').click(function() { //handle highlighting of sidebar list
     $('.nav-sidebar').children('li').removeClass('active');
     $(this).addClass('active');
   });
 
-  $('.nav-list').children('li').click(function() { //handle highlighting of sidebar lists
+  $('.nav-list').children('li').click(function() { //handle highlighting of mobile nav list
     $('.nav-list').children('li').removeClass('active');
     $(this).addClass('active');
   });
