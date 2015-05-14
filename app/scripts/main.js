@@ -186,8 +186,9 @@ function Location(name, lat, lng, show) {
   self.rating = ko.observable('No rating found.');
   self.address = ko.observable('No address found.');
   self.foursquare = ko.observable(false);
+  self.fsFail= ko.observable(false);
   self.infoMarker = ko.computed(function() {
-    if(self.foursquare) {
+    if(self.foursquare()) {
       return '<h1>' + self.name + '</h1>' + 
         self.phone() + '<br />' + 
         self.address().address + '<br />' + 
@@ -201,7 +202,7 @@ function Location(name, lat, lng, show) {
     }
   }, self);
   self.infoList = ko.computed(function() {
-    if(self.foursquare) {
+    if(self.foursquare()) {
       return self.phone() + '<br />' + 
         self.address().address + '<br />' + 
         self.address().city + ', ' + self.address().state + '<br />' +
@@ -209,7 +210,8 @@ function Location(name, lat, lng, show) {
         'Foursquare Rating: ' + self.rating();
     }
     else {
-      return 'Unable to load Foursquare data.';
+      if(self.fsFail()) return 'Unable to load Foursquare data.';
+      else return 'Loading Foursquare data...';
     }
   }, self);
 
@@ -231,7 +233,7 @@ function Location(name, lat, lng, show) {
       infoWindow.setContent(self.infoMarker());
     }).fail(function() {
       self.foursquare(false);
-      infoWindow.setContent(self.infoMarker());
+      infoWindow.setContent('<h1>' + self.name + '</h1>' + 'Unable to load Foursquare data.');
     });
     
     infoWindow.open(map, this);
@@ -254,6 +256,7 @@ function AppViewModel() {
   self.currentList = ourTopPizza;
   self.currentListString = 'our';
   self.filter = ko.observable('');
+  self.fsFail = ko.observable(false);
   self.locations = ko.observableArray(convertToLocations(self.currentList));
 
   self.choosePizzaList = function(data, event) {
@@ -293,13 +296,15 @@ function AppViewModel() {
             address = data.response.groups[0].items[0].venue.location;
 
         location.foursquare(true);
+        location.fsFail(false);
         
         if(typeof rating != 'undefined') location.rating(rating);
         if(typeof phone != 'undefined') location.phone(phone);
         if(typeof hours != 'undefined') location.hours(hours);
-        if(typeof location != 'undefined') location.address(address);
+        if(typeof address != 'undefined') location.address(address);
       }).fail(function() {
         location.foursquare(false);
+        location.fsFail(true);
       });
     }
   }
