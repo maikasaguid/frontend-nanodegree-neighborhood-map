@@ -7,7 +7,12 @@ Udacity Front-End Web Developer Nanodegree Project 5
 I don't know about you folks, but p4 got me hungry for some pizza! For Project 5 I will be presenting some top pizza spots on the island of Oahu in Hawaii.
 
 ##Instructions
-1.  - 
+1.  Navigate to site https://rawgit.com/maikasaguid/p5/master/dist/index.html
+2.  Click the yellow pizza markers to find out more information about a pizza place on the current list.
+3.  Switch between lists on the left sidebar or using the menu button at the top left.
+4.  Switch between the map and list views on the left sidebar or using the menu button at the top left.
+5.  Filter pizza locations by using the text input on the left of the top nav bar or using the menu button at the top left.
+6.  In the list view, click on the pizza place name to find out more information.
 
 ##Resources
 1.  Google Maps v3 - limit viewable area and zoom level
