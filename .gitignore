@@ -6,3 +6,4 @@ ngrok
 *.ai
 test
 *.svg
+/dontupload/
