@@ -5,5 +5,4 @@ bower_components
 ngrok
 *.ai
 test
-*.svg
-/dontupload/
+dontupload
