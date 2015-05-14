@@ -91,7 +91,7 @@ module.exports = function (grunt) {
       test: {
         options: {
           open: false,
-          port: 9002,
+          port: 9001,
           middleware: function(connect) {
             return [
               connect.static('.tmp'),
@@ -220,12 +220,7 @@ module.exports = function (grunt) {
           '<%= config.dist %>',
           '<%= config.dist %>/images',
           '<%= config.dist %>/styles'
-        ],
-        patterns: {
-            js: [
-                [/(images\/.*?\.(?:gif|jpeg|jpg|png|webp))/gm, 'Update the JS to reference our revved images']
-            ]
-        }
+        ]
       },
       html: ['<%= config.dist %>/{,*/}*.html'],
       css: ['<%= config.dist %>/styles/{,*/}*.css']
@@ -314,7 +309,8 @@ module.exports = function (grunt) {
             '*.{ico,png,txt}',
             'images/{,*/}*.webp',
             '{,*/}*.html',
-            'styles/fonts/{,*/}*.*'
+            'styles/fonts/{,*/}*.*',
+            'images/*.svg'
           ]
         }, {
           src: 'node_modules/apache-server-configs/dist/.htaccess',
