@@ -24,6 +24,7 @@ I don't know about you folks, but p4 got me hungry for some pizza! For Project 5
     http://discussions.udacity.com/t/i-cant-get-the-markers-to-change-based-on-the-search-query/15443/2
 
 ##How to Contribute
+Prerequisite: Must have installed [Yeoman](http://yeoman.io)
 1.  Fork the latest code.
 2.  Make your changes.
 3.  Run `grunt serve` from the [root directory](/../../) to deploy to a local environment
