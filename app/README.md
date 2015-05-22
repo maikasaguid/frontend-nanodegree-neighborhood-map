@@ -26,4 +26,4 @@ I don't know about you folks, but p4 got me hungry for some pizza! For Project 5
 ##How to Contribute
 1.  Clone the latest code.
 2.  Run `grunt serve` to deploy to a local environment
-3.  Run `grunt` to build an optimized, production-ready [/dist/](../dist/) folder from which to commit.
+3.  Run `grunt` to build an optimized, production-ready [/dist/](../dist/) folder which would then be deployed to a server.
