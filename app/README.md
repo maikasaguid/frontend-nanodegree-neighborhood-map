@@ -26,6 +26,6 @@ I don't know about you folks, but p4 got me hungry for some pizza! For Project 5
 ##How to Contribute
 1.  Fork the latest code.
 2.  Make your changes.
-3.  Run `grunt serve` from the [root directory](../) to deploy to a local environment
-4.  Run `grunt` from the [root directory](../) to build an optimized, production-ready [/dist/](../dist/) folder which would then be deployed to a server.
+3.  Run `grunt serve` from the [root directory](/../../) to deploy to a local environment
+4.  Run `grunt` from the [root directory](/../../) to build an optimized, production-ready [/dist/](../dist/) folder which would then be deployed to a server.
 5.  Send me a pull request.
