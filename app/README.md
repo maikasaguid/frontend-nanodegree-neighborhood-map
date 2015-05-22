@@ -1,7 +1,8 @@
-p5
+Interactive Map of Top Pizza Joints in Oahu
 ===============================
 
-Udacity Front-End Web Developer Nanodegree Project 5
+Udacity Front-End Web Developer Nanodegree
+Project 5: Neighborhood Map Project
 
 ##Introduction
 I don't know about you folks, but p4 got me hungry for some pizza! For Project 5 I will be presenting some top pizza spots on the island of Oahu in Hawaii.
@@ -21,3 +22,8 @@ I don't know about you folks, but p4 got me hungry for some pizza! For Project 5
     http://snippetrepo.com/snippets/multiple-markers-using-json-with-google-maps-api
 3.  I can’t get the markers to change based on the search query -- Used @MarkN's suggestion to put the Google Maps Marker in a location object.
     http://discussions.udacity.com/t/i-cant-get-the-markers-to-change-based-on-the-search-query/15443/2
+
+##How to Contribute
+1.  Clone the latest code.
+2.  Run `grunt serve` to deploy to a local environment
+3.  Run `grunt` to build an optimized, production-ready /dist/ folder from which to commit.
