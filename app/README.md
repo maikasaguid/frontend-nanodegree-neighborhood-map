@@ -5,10 +5,10 @@ Udacity Front-End Web Developer Nanodegree
 Project 5: Neighborhood Map Project
 
 ##Introduction
-I don't know about you folks, but p4 got me hungry for some pizza! For Project 5 I will be presenting some top pizza spots on the island of Oahu in Hawaii.
+I don't know about you folks, but p4 got me hungry for some pizza! For Project 5 I will be presenting some top pizza spots on the island of Oahu in Hawaii. You can view these pizza spots on a map or in a list view, and if you click on them, you'll get more information such as their contact details and ratings.
 
 ##Instructions
-1.  Navigate to site https://rawgit.com/maikasaguid/p5/master/dist/index.html
+1.  View the live app here: https://rawgit.com/maikasaguid/neighborhood-map/master/dist/index.html
 2.  Click the yellow pizza markers to find out more information about a pizza place on the current list.
 3.  Switch between lists on the left sidebar or using the menu button at the top left.
 4.  Switch between the map and list views on the left sidebar or using the menu button at the top left.
